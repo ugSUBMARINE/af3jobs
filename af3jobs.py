@@ -92,6 +92,7 @@ Constants:
 The `Job` class is the main container for combining chains, ligands, ions, and modifications, creating a
 comprehensive input for AlphaFold 3.
 """
+from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
 from typing import Any, Self
@@ -201,9 +202,6 @@ class Glycan:
     residues: str  # Glycan type
     position: int  # Position of glycan attachment (1-based)
 
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
-
 
 # Modification classes to represent modifications on protein, DNA, or RNA chains
 @dataclass
@@ -213,9 +211,6 @@ class ProteinModification:
     ptmType: str  # CCD code for modification
     ptmPosition: int  # Position of the modified amino acid (1-based)
 
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
-
 
 @dataclass
 class NucleotideModification:
@@ -223,9 +218,6 @@ class NucleotideModification:
 
     modificationType: str  # CCD code for modification
     basePosition: int  # Position of the modified nucleotide (1-based)
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
 
 
 # ProteinChain class
@@ -254,9 +246,9 @@ class ProteinChain:
     def to_dict(self) -> dict[str, Any]:
         d = {"sequence": self.sequence, "count": self.count}
         if self.glycans:
-            d["glycans"] = [glycan.to_dict() for glycan in self.glycans]
+            d["glycans"] = [asdict(glycan) for glycan in self.glycans]
         if self.modifications:
-            d["modifications"] = [mod.to_dict() for mod in self.modifications]
+            d["modifications"] = [asdict(mod) for mod in self.modifications]
         return {"proteinChain": d}
 
 
@@ -284,7 +276,7 @@ class NucleotideChain:
     def to_dict(self) -> dict[str, Any]:
         d = {"sequence": self.sequence, "count": self.count}
         if self.modifications:
-            d["modifications"] = [mod.to_dict() for mod in self.modifications]
+            d["modifications"] = [asdict(mod) for mod in self.modifications]
         return d
 
 
