@@ -1,2 +1,2 @@
 # af3jobs
-script to generate JSON files as input for the AlphaFold3 server
+script to generate JSON job files for the AlphaFold3 server
