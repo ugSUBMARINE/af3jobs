@@ -92,6 +92,7 @@ Constants:
 The `Job` class is the main container for combining chains, ligands, ions, and modifications, creating a
 comprehensive input for AlphaFold 3.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -210,12 +211,14 @@ class Glycan(SequenceModification):
     def to_dict(self) -> dict[str, Any]:
         return {"residues": self.mod_type, "position": self.position}
 
+
 # Modification classes to represent modifications on protein, DNA, or RNA chains
 class ProteinModification(SequenceModification):
     """Represents a post-translational modification on a protein chain."""
 
     def to_dict(self) -> dict[str, Any]:
         return {"ptmType": self.mod_type, "ptmPosition": self.position}
+
 
 class NucleotideModification(SequenceModification):
     """Represents a modification on nucleotide chain."""
@@ -268,14 +271,10 @@ class NucleotideChain:
     def add_modification(self, mod_type: str, position: int) -> Self:
         """Add a modification to the nucleotide chain."""
         if mod_type in _DNA_MODS or mod_type in _RNA_MODS:
-            self.modifications.append(
-                NucleotideModification(mod_type, position)
-            )
+            self.modifications.append(NucleotideModification(mod_type, position))
             return self
         else:
-            raise ValueError(
-                f"Unknown nucleotide modification type: {mod_type}."
-            )
+            raise ValueError(f"Unknown nucleotide modification type: {mod_type}.")
 
     def to_dict(self) -> dict[str, Any]:
         d = {"sequence": self.sequence, "count": self.count}
