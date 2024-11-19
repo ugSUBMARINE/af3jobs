@@ -5,92 +5,11 @@ This module provides data structures representing various molecular elements, in
 chains (DNA/RNA), ligands, ions, and associated modifications. It is tailored for constructing JSON-compatible
 job configurations for AlphaFold 3.
 
-Classes:
-    - Glycan: Represents a glycan attached to a protein chain.
-        - Attributes:
-            - residues (str): Glycan type.
-            - position (int): Attachment position on the protein chain (1-based).
-        - Methods:
-            - to_dict(): Converts the glycan to a dictionary format.
-
-    - ProteinModification: Represents a post-translational modification on a protein chain.
-        - Attributes:
-            - ptmType (str): CCD code for the protein modification.
-            - ptmPosition (int): Position of the modified amino acid (1-based).
-        - Methods:
-            - to_dict(): Converts the modification to a dictionary format.
-
-    - NucleotideModification: Represents a modification on a nucleotide chain.
-        - Attributes:
-            - modificationType (str): CCD code for the nucleotide modification.
-            - basePosition (int): Position of the modified nucleotide (1-based).
-        - Methods:
-            - to_dict(): Converts the modification to a dictionary format.
-
-    - ProteinChain: Represents a protein chain with a sequence, optional glycans, and modifications.
-        - Attributes:
-            - sequence (str): Protein sequence.
-            - count (int): Number of identical chains.
-            - glycans (list): List of Glycan objects attached to the chain.
-            - modifications (list): List of ProteinModification objects on the chain.
-        - Methods:
-            - add_glycan(residues, position): Adds a glycan to the chain.
-            - add_modification(ptmType, ptmPosition): Adds a protein modification.
-            - to_dict(): Converts the chain to a dictionary format.
-
-    - NucleotideChain: Represents a nucleotide chain with a sequence and optional modifications.
-        - Attributes:
-            - sequence (str): Nucleotide sequence.
-            - count (int): Number of identical chains.
-            - modifications (list): List of NucleotideModification objects on the chain.
-        - Methods:
-            - add_modification(modificationType, basePosition): Adds a nucleotide modification.
-            - to_dict(): Converts the chain to a dictionary format.
-
-    - DnaChain(NucleotideChain): Represents a DNA chain in the job configuration.
-        - Methods:
-            - to_dict(): Converts the DNA chain to a dictionary format.
-
-    - RnaChain(NucleotideChain): Represents an RNA chain in the job configuration.
-        - Methods:
-            - to_dict(): Converts the RNA chain to a dictionary format.
-
-    - Ligand: Represents a ligand in the job configuration.
-        - Attributes:
-            - ligand_type (str): CCD code for the ligand.
-            - count (int): Number of ligand molecules.
-        - Methods:
-            - to_dict(): Converts the ligand to a dictionary format.
-
-    - Ion: Represents an ion in the job configuration.
-        - Attributes:
-            - ion_type (str): Symbol of the ion.
-            - count (int): Number of ion molecules.
-        - Methods:
-            - to_dict(): Converts the ion to a dictionary format.
-
-    - Job: Manages and organizes all molecular components for an AlphaFold 3 job.
-        - Attributes:
-            - name (str): Name of the AlphaFold job.
-            - modelSeeds (list): List of model seeds for the job.
-            - sequences (list): List of ProteinChain, DnaChain, RnaChain, Ligand, or Ion objects.
-        - Methods:
-            - add_protein_chain(sequence, count): Adds a protein chain.
-            - add_dna_chain(sequence, count): Adds a DNA chain.
-            - add_rna_chain(sequence, count): Adds an RNA chain.
-            - add_ligand(ligand_type, count): Adds a ligand.
-            - add_ion(ion_type, count): Adds an ion.
-            - to_dict(): Converts the job to a dictionary format for JSON serialization.
-
-Constants:
-    - _PROTEIN_MODS: Allowed protein modification CCD codes.
-    - _DNA_MODS: Allowed DNA modification CCD codes.
-    - _RNA_MODS: Allowed RNA modification CCD codes.
-    - _LIGANDS: Allowed ligands.
-    - _IONS: Allowed ions.
-
 The `Job` class is the main container for combining chains, ligands, ions, and modifications, creating a
 comprehensive input for AlphaFold 3.
+
+It follows the JSON schema defined in the AlphaFold 3 server documentation (as of November 2024):
+https://github.com/google-deepmind/alphafold/blob/main/server/README.md
 """
 
 from __future__ import annotations
@@ -98,10 +17,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Self
 
-__author__ = "Karl Gruber"
-__email__ = "karl.gruber@uni-graz.at"
-__version__ = "0.1.0"
-__date__ = "2024-11-11"
 
 # Allowed modifications, ligands and ions
 _PROTEIN_MODS = [
