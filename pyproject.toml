@@ -1,3 +1,33 @@
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "af3jobs"
+version = "0.1.0"
+description = "Module for defining molecular components, modifications, and job configurations for AlphaFold 3"
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Karl Gruber", email = "karl.gruber@uni-graz.at"}
+]
+keywords = ["AlphaFold", "molecular biology", "protein modeling", "bioinformatics"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/ugSUBMARINE/af3jobs"
+Source = "https://github.com/ugSUBMARINE/af3jobs"
+Tracker = "https://github.com/ugSUBMARINE/af3jobs/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
