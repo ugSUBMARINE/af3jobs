@@ -2,7 +2,7 @@
 
 `af3jobs` is a Python package designed to streamline the process of creating JSON input files for AlphaFold 3.
 It provides data structures and tools for defining molecular components, modifications, and job
-configurations compatible with both the AlphaFold 3 server and the standalone versions.
+configurations compatible with both the [AlphaFold 3 server](https://alphafoldserver.com/welcome) and the [standalone versions](https://github.com/google-deepmind/alphafold3).
 
 ## Features
 
