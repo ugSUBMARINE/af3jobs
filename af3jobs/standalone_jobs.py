@@ -48,6 +48,23 @@ class SequenceModification:
 
 
 @dataclass
+class Template():
+    """Represents a template for a protein chain."""
+
+    mmcif: str
+    query_indices: list[int]
+    template_indices: list[int]
+
+    def to_dict(self) -> dict[str, Any]:
+        d = {
+            "mmcif": self.mmcif,
+            "queryIndices": self.query_indices,
+            "templateIndices": self.template_indices,
+        }
+        return d
+
+
+@dataclass
 class Chain:
     """Base class for protein and nucleotide chains."""
 
@@ -76,6 +93,16 @@ class ProteinChain(Chain):
     paired_msa: str = ""
     templates: list = field(default_factory=list)
 
+    def add_template(self, mmcif: str, query_indices: list[int], template_indices: list[int]) -> Self:
+        """Add a template to the protein chain."""
+        if len(query_indices) != len(template_indices):
+            raise ValueError("Query and template indices must have the same length.")
+        if not mmcif:
+            raise ValueError("Empty mmCIF template string.")
+        template = Template(mmcif, query_indices, template_indices)
+        self.templates.append(template)
+        return self
+
     def to_dict(self) -> dict[str, Any]:
         d = super().to_dict()
         if self.modifications:
@@ -87,8 +114,8 @@ class ProteinChain(Chain):
             d["unpairedMsa"] = self.unpaired_msa
         if self.paired_msa:
             d["pairedMsa"] = self.paired_msa
-        # if self.templates:
-        #     d["templates"] = [template.to_dict() for template in self.templates]
+        if self.templates:
+            d["templates"] = [template.to_dict() for template in self.templates]
         return {"protein": d}
 
 
