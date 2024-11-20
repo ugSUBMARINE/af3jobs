@@ -89,8 +89,8 @@ class Chain:
 class ProteinChain(Chain):
     """Represents a protein chain in the job definition."""
 
-    unpaired_msa: str = ""
-    paired_msa: str = ""
+    unpaired_msa: str | None = None
+    paired_msa: str | None = None
     templates: list = field(default_factory=list)
 
     def add_template(self, mmcif: str, query_indices: list[int], template_indices: list[int]) -> Self:
@@ -110,9 +110,9 @@ class ProteinChain(Chain):
                 {"ptmType": mod.mod_type, "ptmPosition": mod.position}
                 for mod in self.modifications
             ]
-        if self.unpaired_msa:
+        if self.unpaired_msa is not None:
             d["unpairedMsa"] = self.unpaired_msa
-        if self.paired_msa:
+        if self.paired_msa is not None:
             d["pairedMsa"] = self.paired_msa
         if self.templates:
             d["templates"] = [template.to_dict() for template in self.templates]
@@ -136,7 +136,7 @@ class DnaChain(Chain):
 class RnaChain(Chain):
     """Represents an RNA chain in the job definition."""
 
-    unpaired_msa: str = ""
+    unpaired_msa: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = super().to_dict()
@@ -145,7 +145,7 @@ class RnaChain(Chain):
                 {"modificationType": mod.mod_type, "basePosition": mod.position}
                 for mod in self.modifications
             ]
-        if self.unpaired_msa:
+        if self.unpaired_msa is not None:
             d["unpairedMsa"] = self.unpaired_msa
         return {"rna": d}
 
