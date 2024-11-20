@@ -10,7 +10,8 @@ readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Karl Gruber", email = "karl.gruber@uni-graz.at"}
+    {name = "Karl Gruber", email = "karl.gruber@uni-graz.at"},
+    {name = "Gregor Wirnsberger", email = "test@test.com"}
 ]
 keywords = ["AlphaFold", "molecular biology", "protein modeling", "bioinformatics"]
 classifiers = [
