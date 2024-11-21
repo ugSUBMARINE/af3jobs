@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
     {name = "Karl Gruber", email = "karl.gruber@uni-graz.at"},
-    {name = "Gregor Wirnsberger", email = "test@test.com"}
+    {name = "Gregor Wirnsberger", email = "gregor.wirnsberger@uni-graz.at"}
 ]
 keywords = ["AlphaFold", "molecular biology", "protein modeling", "bioinformatics"]
 classifiers = [
