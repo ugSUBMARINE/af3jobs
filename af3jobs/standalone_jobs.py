@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from itertools import product, islice
 from random import randint
 from typing import Any, Self
+import warnings
 
 
 def chain_id(letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
@@ -48,7 +49,7 @@ class SequenceModification:
 
 
 @dataclass
-class Template():
+class Template:
     """Represents a template for a protein chain."""
 
     mmcif: str
@@ -93,7 +94,9 @@ class ProteinChain(Chain):
     paired_msa: str | None = None
     templates: list = field(default_factory=list)
 
-    def add_template(self, mmcif: str, query_indices: list[int], template_indices: list[int]) -> Self:
+    def add_template(
+        self, mmcif: str, query_indices: list[int], template_indices: list[int]
+    ) -> Self:
         """Add a template to the protein chain."""
         if len(query_indices) != len(template_indices):
             raise ValueError("Query and template indices must have the same length.")
@@ -256,6 +259,10 @@ class Job:
         """Add a ligand to the job."""
         if ccd_codes is None and smiles is None:
             raise ValueError("Either CCD codes or SMILES string must be provided.")
+        if ccd_codes is not None and smiles is not None:
+            warnings.warn(
+                "`ccd_codes` and `smiles` are given - they are mutually exclusive - will be using smiles"
+            )
         ids = self._get_ids(ids, count)
         if smiles:
             ligand = Ligand(ids, smiles=smiles)
