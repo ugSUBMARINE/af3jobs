@@ -183,8 +183,8 @@ class Job:
     def __post_init__(self):
         """Post-initialization method."""
         if not self.model_seeds:
-            # generate random model seeds
-            self.model_seeds = [randint(0, 32767)]
+            # generate a random model seed
+            self.model_seeds = [randint(2**5, 2**30)]
 
         # Initialize the chain ID generator
         self.chain_ids = chain_id()
