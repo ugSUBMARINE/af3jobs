@@ -15,29 +15,12 @@ https://github.com/google-deepmind/alphafold3/blob/main/docs/input.md
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from itertools import product, islice
+from itertools import islice
 from random import randint
 from typing import Any, Self
 import warnings
 
-
-def chain_id(letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
-    """
-    Generator function to yield mmCIF chain IDs.
-
-    This generator sequentially produces unique chain identifiers commonly used in mmCIF files.
-    It generates all uppercase single-letter IDs ('A', 'B', ..., 'Z') followed by all possible
-    two-letter combinations in 'reverse spreadsheet style' ('AA', 'BA', ..., 'ZZ').
-
-    Yields:
-        str: A unique chain ID in the sequence described.
-    """
-    # Yield single uppercase letters first
-    yield from letters
-
-    # Yield combinations of two uppercase letters
-    for combination in product(letters, repeat=2):
-        yield "".join(reversed(combination))
+from .utils import chain_id
 
 
 @dataclass
@@ -190,7 +173,7 @@ class Job:
             self.model_seeds = [randint(2**5, 2**30)]
 
         # Initialize the chain ID generator
-        self.chain_ids = chain_id()
+        self._chain_ids = chain_id()
 
     def _check_ids(self) -> None:
         """Check for duplicate IDs."""
@@ -202,7 +185,12 @@ class Job:
 
     def _get_ids(self, ids, count) -> list[str]:
         if ids is None:
-            ids = list(islice(self.chain_ids, count))
+            if count >= 1:
+                ids = list(islice(self._chain_ids, count))
+            else:
+                raise ValueError(
+                    "Number of chains or ligands must be greater than zero."
+                )
         else:
             if isinstance(ids, str):
                 ids = [ids]
