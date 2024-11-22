@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Self
 
-from .utils import SequenceModification
+from .components import SequenceModification
 
 # Allowed modifications, ligands and ions
 _PROTEIN_MODS = [
