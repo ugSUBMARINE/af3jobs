@@ -20,7 +20,7 @@ from random import randint
 from typing import Any, Self
 import warnings
 
-from .utils import chain_id
+from utils import chain_id
 
 
 @dataclass
