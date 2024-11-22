@@ -20,15 +20,7 @@ from random import randint
 from typing import Any, Self
 import warnings
 
-from utils import chain_id
-
-
-@dataclass
-class SequenceModification:
-    """Represents a sequence modifications."""
-
-    mod_type: str  # modification type
-    position: int  # position of the modification (1-based)
+from .utils import chain_id, SequenceModification
 
 
 @dataclass
@@ -310,32 +302,3 @@ class Job:
         d["version"] = self.version
 
         return d
-
-
-if __name__ == "__main__":
-    import json
-
-    # Create a new job
-    job = Job(name="Sample AlphaFold Job", model_seeds=[42])
-    # Add a protein chain with glycans and modifications
-    protein_chain = job.add_protein_chain(sequence="MVLSEGEWQLVLHVWAKVEA", count=2)
-    protein_chain.add_modification(mod_type="HY3", position=1)
-
-    # Add a DNA chain with modifications
-    dna_chain = job.add_dna_chain(sequence="GATTACA", count=1)
-    dna_chain.add_modification(mod_type="6OG", position=1)
-
-    # Add an RNA chain with modifications
-    rna_chain = job.add_rna_chain(sequence="GUAC", count=1)
-    rna_chain.add_modification(mod_type="2MG", position=3)
-
-    # Add a ligand and an ion
-    job.add_ligand(ccd_codes="HEM", count=2)
-
-    # Convert the job to a dictionary and print it
-    job_dict = job.to_dict()
-    print("Job as dictionary:\n", job_dict)
-
-    # Save the job as a JSON file
-    with open("job_request.json", "w") as json_file:
-        json.dump(job_dict, json_file, indent=2)
