@@ -75,7 +75,7 @@ class ProteinChain(Chain):
 
     unpaired_msa: str | None = None
     paired_msa: str | None = None
-    templates: list = field(default_factory=list)
+    templates: list[Template] = field(default_factory=list)
 
     def add_template(
         self, mmcif: str, query_indices: list[int], template_indices: list[int]
@@ -96,12 +96,35 @@ class ProteinChain(Chain):
                 {"ptmType": mod.mod_type, "ptmPosition": mod.position}
                 for mod in self.modifications
             ]
-        if self.unpaired_msa is not None:
-            d["unpairedMsa"] = self.unpaired_msa
-        if self.paired_msa is not None:
-            d["pairedMsa"] = self.paired_msa
+
+        # check the combination of MSA and template data
+        if self.unpaired_msa is None and self.paired_msa is not None:
+            # if only paired MSA is provided, raise an error
+            # 0, 1, 0  ERROR
+            # 0, 1, 1  ERROR
+            raise ValueError(
+                f"Only 'paired_msa' is provided for protein chain(s) {self.ids}."
+            )
         if self.templates:
+            # if templates are provided, unpaired MSA and paired MSA must be set, but can be empty
+            # 0, 0, 1  OK
+            # 1, 1, 1  OK
+            # 1, 0, 1  OK
+            d["unpairedMsa"] = self.unpaired_msa or ""
+            d["pairedMsa"] = self.paired_msa or ""
             d["templates"] = [template.to_dict() for template in self.templates]
+        elif self.unpaired_msa is not None:
+            # if only unpaired MSA is provided, paired MSA must be set, but can be empty
+            # 1, 0, 0  OK
+            # 1, 1, 0  OK
+            d["unpairedMsa"] = self.unpaired_msa
+            d["pairedMsa"] = self.paired_msa or ""
+            d["templates"] = []
+        else:
+            # neither MSA nor templates are provided, do nothing
+            # 0, 0, 0  OK
+            pass
+
         return {"protein": d}
 
 
