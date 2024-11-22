@@ -1,10 +1,6 @@
 """
 Module for defining molecular components, modifications, and job configurations for AlphaFold 3.
 
-This module provides data structures representing various molecular elements, including protein chains, nucleotide
-chains (DNA/RNA), ligands/ions, and associated modifications. It is tailored for constructing job configurations
-for AlphaFold 3 in JSON format.
-
 The `Job` class is the main container for combining chains, ligands/ions, and modifications that can be converted
 to JSON as input for AlphaFold 3.
 

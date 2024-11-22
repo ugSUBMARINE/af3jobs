@@ -1,4 +1,8 @@
-"""Components for AF3 jobs."""
+"""
+This module provides data structures representing various molecular elements, including protein chains, nucleotide
+chains (DNA/RNA), ligands/ions, and associated modifications. It is tailored for constructing job configurations
+for AlphaFold 3 in JSON format.
+"""
 
 from dataclasses import dataclass, field
 from typing import Any, Self
