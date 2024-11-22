@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Self
 
+from .utils import SequenceModification
 
 # Allowed modifications, ligands and ions
 _PROTEIN_MODS = [
@@ -110,38 +111,6 @@ _IONS = [
 ]
 
 
-# Base class for sequence modifications
-@dataclass
-class SequenceModification:
-    """Base class for sequence modifications."""
-
-    mod_type: str  # Modification type
-    position: int  # Position of the modification (1-based)
-
-
-# Glycan class to represent glycosylation on protein chains
-class Glycan(SequenceModification):
-    """Represents a glycan attached to a protein chain."""
-
-    def to_dict(self) -> dict[str, Any]:
-        return {"residues": self.mod_type, "position": self.position}
-
-
-# Modification classes to represent modifications on protein, DNA, or RNA chains
-class ProteinModification(SequenceModification):
-    """Represents a post-translational modification on a protein chain."""
-
-    def to_dict(self) -> dict[str, Any]:
-        return {"ptmType": self.mod_type, "ptmPosition": self.position}
-
-
-class NucleotideModification(SequenceModification):
-    """Represents a modification on nucleotide chain."""
-
-    def to_dict(self) -> dict[str, Any]:
-        return {"modificationType": self.mod_type, "basePosition": self.position}
-
-
 # ProteinChain class
 @dataclass
 class ProteinChain:
@@ -149,18 +118,18 @@ class ProteinChain:
 
     sequence: str
     count: int = 1
-    glycans: list[Glycan] = field(default_factory=list)
-    modifications: list[ProteinModification] = field(default_factory=list)
+    glycans: list[SequenceModification] = field(default_factory=list)
+    modifications: list[SequenceModification] = field(default_factory=list)
 
     def add_glycan(self, residues: str, position: int) -> Self:
         """Add a glycan to the protein chain."""
-        self.glycans.append(Glycan(residues, position))
+        self.glycans.append(SequenceModification(residues, position))
         return self
 
     def add_modification(self, mod_type: str, position: int) -> Self:
         """Add a modification to the protein chain."""
         if mod_type in _PROTEIN_MODS:
-            self.modifications.append(ProteinModification(mod_type, position))
+            self.modifications.append(SequenceModification(mod_type, position))
             return self
         else:
             raise ValueError(f"Unknown protein modification type: {mod_type}.")
@@ -168,9 +137,15 @@ class ProteinChain:
     def to_dict(self) -> dict[str, Any]:
         d = {"sequence": self.sequence, "count": self.count}
         if self.glycans:
-            d["glycans"] = [glycan.to_dict() for glycan in self.glycans]
+            d["glycans"] = [
+                {"residues": glycan.mod_type, "position": glycan.position}
+                for glycan in self.glycans
+            ]
         if self.modifications:
-            d["modifications"] = [mod.to_dict() for mod in self.modifications]
+            d["modifications"] = [
+                {"ptmType": mod.mod_type, "ptmPosition": mod.position}
+                for mod in self.modifications
+            ]
         return {"proteinChain": d}
 
 
@@ -181,12 +156,12 @@ class NucleotideChain:
 
     sequence: str
     count: int = 1
-    modifications: list[NucleotideModification] = field(default_factory=list)
+    modifications: list[SequenceModification] = field(default_factory=list)
 
     def add_modification(self, mod_type: str, position: int) -> Self:
         """Add a modification to the nucleotide chain."""
         if mod_type in _DNA_MODS or mod_type in _RNA_MODS:
-            self.modifications.append(NucleotideModification(mod_type, position))
+            self.modifications.append(SequenceModification(mod_type, position))
             return self
         else:
             raise ValueError(f"Unknown nucleotide modification type: {mod_type}.")
@@ -194,7 +169,10 @@ class NucleotideChain:
     def to_dict(self) -> dict[str, Any]:
         d = {"sequence": self.sequence, "count": self.count}
         if self.modifications:
-            d["modifications"] = [mod.to_dict() for mod in self.modifications]
+            d["modifications"] = [
+                {"modificationType": mod.mod_type, "basePosition": mod.position}
+                for mod in self.modifications
+            ]
         return d
 
 
@@ -295,35 +273,3 @@ class Job:
         else:
             raise ValueError("Empty list of sequences.")
         return d
-
-
-if __name__ == "__main__":
-    import json
-
-    # Create a new job
-    job = Job(name="Sample AlphaFold Job")
-
-    # Add a protein chain with glycans and modifications
-    protein_chain = job.add_protein_chain(sequence="MVLSEGEWQLVLHVWAKVEA", count=2)
-    protein_chain.add_glycan(residues="NAG(NAG)(BMA)", position=8)
-    protein_chain.add_modification(mod_type="CCD_HY3", position=1)
-
-    # Add a DNA chain with modifications
-    dna_chain = job.add_dna_chain(sequence="GATTACA", count=1)
-    dna_chain.add_modification(mod_type="CCD_6OG", position=1)
-
-    # Add an RNA chain with modifications
-    rna_chain = job.add_rna_chain(sequence="GUAC", count=1)
-    rna_chain.add_modification(mod_type="CCD_2MG", position=1)
-
-    # Add a ligand and an ion
-    job.add_ligand(ligand_type="CCD_ATP", count=1)
-    job.add_ion(ion_type="MG", count=2)
-
-    # Convert the job to a dictionary and print it
-    job_dict = job.to_dict()
-    print("Job as dictionary:", job_dict)
-
-    # Save the job as a JSON file
-    with open("job_request.json", "w") as json_file:
-        json.dump([job_dict], json_file, indent=4)

@@ -1,5 +1,6 @@
-"""module for various utility functions"""
+"""module for various utility functions and classes"""
 
+from dataclasses import dataclass
 from itertools import product
 
 
@@ -20,3 +21,12 @@ def chain_id(letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
     # Yield combinations of two uppercase letters
     for combination in product(letters, repeat=2):
         yield "".join(reversed(combination))
+
+
+# Base class for sequence modifications
+@dataclass
+class SequenceModification:
+    """Base class for sequence modifications."""
+
+    mod_type: str  # Modification type
+    position: int  # Position of the modification (1-based)
