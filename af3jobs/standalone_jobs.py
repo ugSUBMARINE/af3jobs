@@ -10,13 +10,13 @@ https://github.com/google-deepmind/alphafold3/blob/main/docs/input.md
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from itertools import islice
 from random import randint
 from typing import Any
-import warnings
 
-from .components import Chain, Ligand, ProteinChain, DnaChain, RnaChain
+from .components import Chain, DnaChain, Ligand, ProteinChain, RnaChain
 from .utils import chain_id
 
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from itertools import product
 import json
+from itertools import product
 from typing import Generator
 
 
