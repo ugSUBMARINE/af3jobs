@@ -147,7 +147,7 @@ class Job:
 
         # add user CCD
         if self.user_ccd:
-            d["userCcd"] = self.user_ccd
+            d["userCCD"] = self.user_ccd
 
         d["dialect"] = self.dialect
         d["version"] = self.version
