@@ -153,3 +153,9 @@ class Job:
         d["version"] = self.version
 
         return d
+
+    def write_af3_json(self, filename: str, **kwargs) -> None:
+        """Write the job to a JSON file as input for AF3."""
+        import json
+        with open(filename, "w") as f:
+            json.dump(self.to_dict(), f, **kwargs)

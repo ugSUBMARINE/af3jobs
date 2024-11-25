@@ -34,7 +34,6 @@ The `Job` class is the main container for combining protein and nucleotide chain
 that can be converted to JSON as input for AlphaFold 3.
 
 ```python
-import json
 from af3jobs import Job
 
 # Create a new job
@@ -57,8 +56,7 @@ dna_chain.add_modification(mod_type="6OG", position=1)
 job.add_ligand(ccd_codes="HEM", ids=["X", "Y"])
 
 # Export to JSON
-with open("standalone_job.json", "w") as f:
-    json.dump(job.to_dict(), f, indent=4)
+job.write_af3_json("standalone_job.json", indent=4)
 ```
 
 ### Server Job Example
