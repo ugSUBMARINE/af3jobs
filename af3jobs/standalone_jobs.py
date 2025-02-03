@@ -30,13 +30,13 @@ class Job:
     bonded_atom_pairs: list = field(default_factory=list)
     user_ccd: str = ""
     dialect: str = "alphafold3"
-    version: str = 1
+    version: int = 1
 
     def __post_init__(self):
         """Post-initialization method."""
         if not self.model_seeds:
             # generate a random model seed
-            self.model_seeds = [randint(2**5, 2**30)]
+            self.model_seeds = [randint(1, 1 << 31)]
 
         # Initialize the chain ID generator
         self._chain_ids = chain_id()
