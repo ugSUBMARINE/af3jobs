@@ -52,6 +52,9 @@ protein_chain.add_templates_from_json("some_job_data.json")
 dna_chain = job.add_dna_chain(sequence="GATTACA", ids="C")
 dna_chain.add_modification(mod_type="6OG", position=1)
 
+# Add a bonded atom pair
+job.add_bonded_atom_pair(id_1="A", resi_1=1, name_1="N", id_2="B", resi_2=2, name_2="C")
+
 # Add two heme cofactors
 job.add_ligand(ccd_codes="HEM", ids=["X", "Y"])
 

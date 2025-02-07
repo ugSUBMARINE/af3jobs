@@ -16,9 +16,13 @@ from itertools import islice
 from random import randint
 from typing import Any
 
-from .components import Chain, DnaChain, Ligand, ProteinChain, RnaChain
+from .components import DnaChain, Ligand, ProteinChain, RnaChain
 from .utils import chain_id
 
+# type definitions
+Sequence = ProteinChain | DnaChain | RnaChain | Ligand
+Atom = tuple[str, int, str]
+Bond = tuple[Atom, Atom]
 
 @dataclass
 class Job:
@@ -26,11 +30,11 @@ class Job:
 
     name: str
     model_seeds: list[int] = field(default_factory=list)
-    sequences: list[Chain | Ligand] = field(default_factory=list)
-    bonded_atom_pairs: list = field(default_factory=list)
+    sequences: list[Sequence] = field(default_factory=list)
+    bonded_atom_pairs: list[Bond] = field(default_factory=list)
     user_ccd: str = ""
     dialect: str = "alphafold3"
-    version: int = 1
+    version: int = 2  # default version
 
     def __post_init__(self):
         """Post-initialization method."""
@@ -127,6 +131,10 @@ class Job:
         self.sequences.append(ligand)
         return ligand
 
+    def add_bonded_atom_pair(self, id_1: str, resi_1: int, name_1: str, id_2: str, resi_2: int, name_2: str) -> None:
+        """Add a bonded atom pair to the job."""
+        self.bonded_atom_pairs.append(((id_1, resi_1, name_1), (id_2, resi_2, name_2)))
+        
     def to_dict(self) -> dict[str, Any]:
         """Convert the Job to a dictionary suitable for JSON serialization."""
         d = {
@@ -137,7 +145,7 @@ class Job:
         # add sequences / ligands / ions
         if self.sequences:
             self._check_ids()
-            d["sequences"] = [seq.to_dict() for seq in self.sequences]
+            d["sequences"] = [seq.to_dict(self.version) for seq in self.sequences]
         else:
             raise ValueError("Empty list of sequences.")
 
