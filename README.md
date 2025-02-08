@@ -74,22 +74,36 @@ from af3jobs import ServerJob
 # Create a new job
 job = ServerJob(name="Sample AlphaFold Server Job")
 
-# Add a protein chain with glycans and modifications
-protein_chain = job.add_protein_chain(sequence="MVLSEGEWQLVLHVWAKVEA", count=2)
+# Add a protein chain with glycans and modifications, set a maximum date for the used template
+protein_chain = job.add_protein_chain(sequence="PREACHINGS", count=1, max_template_date="2018-01-20")
 protein_chain.add_glycan(residues="NAG(NAG)(BMA)", position=8)
+protein_chain.add_glycan(residues="BMA", position=10)
 protein_chain.add_modification(mod_type="CCD_HY3", position=1)
+protein_chain.add_modification(mod_type="CCD_P1L", position=5)
+
+# Add a protein chain for which the structure templates should not be used
+protein_chain_no_templates = job.add_protein_chain(sequence="REACHER", count=1, use_structure_template=False)
 
 # Add a DNA chain with modifications
 dna_chain = job.add_dna_chain(sequence="GATTACA", count=1)
 dna_chain.add_modification(mod_type="CCD_6OG", position=1)
+dna_chain.add_modification(mod_type="CCD_6MA", position=2)
+
+# Add an RNA chain with modifications
+rna_chain = job.add_rna_chain(sequence="GUAC", count=1)
+rna_chain.add_modification(mod_type="CCD_2MG", position=1)
 
 # Add a ligand and an ion
 job.add_ligand(ligand_type="CCD_ATP", count=1)
 job.add_ion(ion_type="MG", count=2)
 
-# Export to JSON
-with open("server_job.json", "w") as f:
-    json.dump([job.to_dict()], f, indent=4)
+# Convert the job to a dictionary and print it
+job_dict = job.to_dict()
+print("Job as dictionary:", job_dict)
+
+# Save the job as a JSON file
+with open("job_request.json", "w") as json_file:
+    json.dump([job_dict], json_file, indent=4)
 ```
 
 ## License

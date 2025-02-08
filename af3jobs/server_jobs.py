@@ -120,6 +120,8 @@ class ProteinChain:
     count: int = 1
     glycans: list[SequenceModification] = field(default_factory=list)
     modifications: list[SequenceModification] = field(default_factory=list)
+    use_structure_template: bool = True
+    max_template_date: str | None = None
 
     def add_glycan(self, residues: str, position: int) -> Self:
         """Add a glycan to the protein chain."""
@@ -146,6 +148,14 @@ class ProteinChain:
                 {"ptmType": mod.mod_type, "ptmPosition": mod.position}
                 for mod in self.modifications
             ]
+        # new parameters in version 1
+        # only include useStructureTemplate if it is False
+        if not self.use_structure_template:
+            d["useStructureTemplate"] = False
+        # only include maxTemplateDate if it has been set explicitly
+        if self.max_template_date is not None:
+            d["maxTemplateDate"] = self.max_template_date
+
         return {"proteinChain": d}
 
 
@@ -215,6 +225,8 @@ class Ion:
         return {"ion": {"ion": self.ion_type, "count": self.count}}
 
 
+Sequence = ProteinChain | DnaChain | RnaChain | Ligand | Ion
+
 # Job class to combine all entities and manage them
 @dataclass
 class Job:
@@ -222,13 +234,21 @@ class Job:
 
     name: str
     modelSeeds: list[int] = field(default_factory=list)
-    sequences: list[ProteinChain | DnaChain | RnaChain | Ligand | Ion] = field(
+    sequences: list[Sequence] = field(
         default_factory=list
     )
+    dialect: str = "alphafoldserver"
+    version: int = 1
 
-    def add_protein_chain(self, sequence: str, count: int = 1) -> ProteinChain:
+    def add_protein_chain(
+            self, sequence: str, count: int = 1, max_template_date: str | None = None,
+            use_structure_template: bool = True
+    ) -> ProteinChain:
         """Add a protein chain to the job."""
-        protein_chain = ProteinChain(sequence, count)
+        protein_chain = ProteinChain(
+            sequence, count, max_template_date=max_template_date,
+            use_structure_template=use_structure_template
+        )
         self.sequences.append(protein_chain)
         return protein_chain
 
@@ -272,4 +292,6 @@ class Job:
             d["sequences"] = [sequence.to_dict() for sequence in self.sequences]
         else:
             raise ValueError("Empty list of sequences.")
+        d["dialect"] = self.dialect
+        d["version"] = self.version
         return d
