@@ -3,6 +3,7 @@ This module provides data structures representing various molecular elements, in
 chains (DNA/RNA), ligands/ions, and associated modifications. It is tailored for constructing job configurations
 for AlphaFold 3 in JSON format.
 """
+
 from __future__ import annotations
 
 import warnings
@@ -28,13 +29,17 @@ class Template:
     mmcif: str | None  # mmCIF template string
     query_indices: list[int]
     template_indices: list[int]
-    mmcif_path: str | None  = None  # path to the mmCIF file
+    mmcif_path: str | None = None  # path to the mmCIF file
 
     def __post_init__(self):
         if self.mmcif and self.mmcif_path:
-            raise ValueError("Both 'mmcif' and 'mmcif_path' are provided for the template.")
+            raise ValueError(
+                "Both 'mmcif' and 'mmcif_path' are provided for the template."
+            )
         if not self.mmcif and not self.mmcif_path:
-            raise ValueError("Neither 'mmcif' nor 'mmcif_path' is provided for the template.")
+            raise ValueError(
+                "Neither 'mmcif' nor 'mmcif_path' is provided for the template."
+            )
         if len(self.query_indices) != len(self.template_indices):
             raise ValueError("Query and template indices must have the same length.")
 
@@ -144,6 +149,7 @@ class Chain:
         self.paired_msa = msa
         return self
 
+
 @dataclass
 class ProteinChain(Chain):
     """Represents a protein chain in the job definition."""
@@ -158,7 +164,9 @@ class ProteinChain(Chain):
         self.templates.append(template)
         return self
 
-    def add_template_mmcif_path(self, mmcif_path: str, query_indices: list[int], template_indices: list[int]) -> Self:
+    def add_template_mmcif_path(
+        self, mmcif_path: str, query_indices: list[int], template_indices: list[int]
+    ) -> Self:
         """Add a template to the protein chain using a path to an mmCIF file. ONLY for AF3 input file version >= 2."""
         template = Template(None, query_indices, template_indices, mmcif_path)
         if self.templates is None:
@@ -194,9 +202,13 @@ class ProteinChain(Chain):
 
         # handling MSA and MSA path
         if self.unpaired_msa is not None and self.unpaired_msa_path is not None:
-            raise ValueError(f"Both 'unpaired_msa' and 'unpaired_msa_path' are provided for protein chain(s) {self.ids}.")
+            raise ValueError(
+                f"Both 'unpaired_msa' and 'unpaired_msa_path' are provided for protein chain(s) {self.ids}."
+            )
         if self.paired_msa is not None and self.paired_msa_path is not None:
-            raise ValueError(f"Both 'paired_msa' and 'paired_msa_path' are provided for protein chain(s) {self.ids}.")
+            raise ValueError(
+                f"Both 'paired_msa' and 'paired_msa_path' are provided for protein chain(s) {self.ids}."
+            )
 
         if self.unpaired_msa is not None:
             # case 1 0
@@ -247,7 +259,9 @@ class RnaChain(Chain):
 
         # handling MSA and MSA path
         if self.unpaired_msa is not None and self.unpaired_msa_path is not None:
-            raise ValueError(f"Both 'unpaired_msa' and 'unpaired_msa_path' are provided for RNA chain(s) {self.ids}.")
+            raise ValueError(
+                f"Both 'unpaired_msa' and 'unpaired_msa_path' are provided for RNA chain(s) {self.ids}."
+            )
 
         if self.unpaired_msa is not None:
             d["unpairedMsa"] = self.unpaired_msa

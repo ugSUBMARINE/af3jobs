@@ -24,6 +24,7 @@ Sequence = ProteinChain | DnaChain | RnaChain | Ligand
 Atom = tuple[str, int, str]
 Bond = tuple[Atom, Atom]
 
+
 @dataclass
 class Job:
     """Represents an AlphaFold3 job with methods to add entities."""
@@ -131,10 +132,12 @@ class Job:
         self.sequences.append(ligand)
         return ligand
 
-    def add_bonded_atom_pair(self, id_1: str, resi_1: int, name_1: str, id_2: str, resi_2: int, name_2: str) -> None:
+    def add_bonded_atom_pair(
+        self, id_1: str, resi_1: int, name_1: str, id_2: str, resi_2: int, name_2: str
+    ) -> None:
         """Add a bonded atom pair to the job."""
         self.bonded_atom_pairs.append(((id_1, resi_1, name_1), (id_2, resi_2, name_2)))
-        
+
     def to_dict(self) -> dict[str, Any]:
         """Convert the Job to a dictionary suitable for JSON serialization."""
         d = {
@@ -165,5 +168,6 @@ class Job:
     def write_af3_json(self, filename: str, **kwargs) -> None:
         """Write the job to a JSON file as input for AF3."""
         import json
+
         with open(filename, "w") as f:
             json.dump(self.to_dict(), f, **kwargs)

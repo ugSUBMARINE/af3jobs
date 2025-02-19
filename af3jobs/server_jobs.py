@@ -227,6 +227,7 @@ class Ion:
 
 Sequence = ProteinChain | DnaChain | RnaChain | Ligand | Ion
 
+
 # Job class to combine all entities and manage them
 @dataclass
 class Job:
@@ -234,20 +235,23 @@ class Job:
 
     name: str
     modelSeeds: list[int] = field(default_factory=list)
-    sequences: list[Sequence] = field(
-        default_factory=list
-    )
+    sequences: list[Sequence] = field(default_factory=list)
     dialect: str = "alphafoldserver"
     version: int = 1
 
     def add_protein_chain(
-            self, sequence: str, count: int = 1, max_template_date: str | None = None,
-            use_structure_template: bool = True
+        self,
+        sequence: str,
+        count: int = 1,
+        max_template_date: str | None = None,
+        use_structure_template: bool = True,
     ) -> ProteinChain:
         """Add a protein chain to the job."""
         protein_chain = ProteinChain(
-            sequence, count, max_template_date=max_template_date,
-            use_structure_template=use_structure_template
+            sequence,
+            count,
+            max_template_date=max_template_date,
+            use_structure_template=use_structure_template,
         )
         self.sequences.append(protein_chain)
         return protein_chain
