@@ -54,7 +54,7 @@ class Job:
         if len(seq_ids) != len(set(seq_ids)):
             raise ValueError(f"Duplicate chain IDs found: {seq_ids}")
 
-    def _get_ids(self, ids, count) -> list[str]:
+    def _get_ids(self, ids: None | str | list[str], count: int) -> list[str]:
         if ids is None:
             if count >= 1:
                 ids = list(islice(self._chain_ids, count))
