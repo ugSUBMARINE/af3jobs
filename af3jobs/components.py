@@ -31,7 +31,7 @@ class Template:
     template_indices: list[int]
     mmcif_path: str | None = None  # path to the mmCIF file
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.mmcif and self.mmcif_path:
             raise ValueError(
                 "Both 'mmcif' and 'mmcif_path' are provided for the template."
@@ -161,6 +161,8 @@ class ProteinChain(Chain):
     ) -> Self:
         """Add a template to the protein chain."""
         template = Template(mmcif, query_indices, template_indices)
+        if self.templates is None:
+            self.templates = []
         self.templates.append(template)
         return self
 
@@ -285,5 +287,5 @@ class Ligand:
         if self.smiles:
             d["smiles"] = self.smiles
         else:
-            d["ccdCodes"] = self.ccd_codes
+            d["ccdCodes"] = self.ccd_codes  # type: ignore
         return {"ligand": d}

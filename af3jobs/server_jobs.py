@@ -288,7 +288,7 @@ class Job:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the Job to a dictionary suitable for JSON serialization."""
-        d = {
+        d: dict[str, Any] = {
             "name": self.name,
             "modelSeeds": self.modelSeeds,
         }

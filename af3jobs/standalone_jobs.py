@@ -37,7 +37,7 @@ class Job:
     dialect: str = "alphafold3"
     version: int = 2  # default version
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Post-initialization method."""
         if not self.model_seeds:
             # generate a random model seed
@@ -48,7 +48,7 @@ class Job:
 
     def _check_ids(self) -> None:
         """Check for duplicate IDs."""
-        seq_ids = []
+        seq_ids: list[str] = []
         for seq in self.sequences:
             seq_ids.extend(seq.ids)
         if len(seq_ids) != len(set(seq_ids)):
@@ -69,44 +69,32 @@ class Job:
                 raise TypeError("IDs must be a string or a list of strings.")
         return ids
 
-    def _add_chain(
-        self,
-        chain_type: str,
-        sequence: str,
-        count: int = 1,
-        ids: None | str | list[str] = None,
-    ) -> ProteinChain | DnaChain | RnaChain:
-        """Create a chain object depending on 'chain_type'."""
-        ids = self._get_ids(ids, count)
-        match chain_type:
-            case "protein":
-                chn = ProteinChain(ids, sequence)
-            case "dna":
-                chn = DnaChain(ids, sequence)
-            case "rna":
-                chn = RnaChain(ids, sequence)
-            case _:
-                raise ValueError(f"Invalid chain type: {chain_type}")
-        self.sequences.append(chn)
-        return chn
-
     def add_protein_chain(
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> ProteinChain:
         """Add a protein chain to the job."""
-        return self._add_chain("protein", sequence, count, ids)
+        ids = self._get_ids(ids, count)
+        chn = ProteinChain(ids, sequence)
+        self.sequences.append(chn)
+        return chn
 
     def add_dna_chain(
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> DnaChain:
         """Add a DNA chain to the job."""
-        return self._add_chain("dna", sequence, count, ids)
+        ids = self._get_ids(ids, count)
+        chn = DnaChain(ids, sequence)
+        self.sequences.append(chn)
+        return chn
 
     def add_rna_chain(
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> RnaChain:
         """Add an RNA chain to the job."""
-        return self._add_chain("rna", sequence, count, ids)
+        ids = self._get_ids(ids, count)
+        chn = RnaChain(ids, sequence)
+        self.sequences.append(chn)
+        return chn
 
     def add_ligand(
         self,
@@ -140,7 +128,7 @@ class Job:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the Job to a dictionary suitable for JSON serialization."""
-        d = {
+        d: dict[str, Any] = {
             "name": self.name,
             "modelSeeds": self.model_seeds,
         }
@@ -165,7 +153,7 @@ class Job:
 
         return d
 
-    def write_af3_json(self, filename: str, **kwargs) -> None:
+    def write_af3_json(self, filename: str, **kwargs: Any) -> None:
         """Write the job to a JSON file as input for AF3."""
         import json
 
