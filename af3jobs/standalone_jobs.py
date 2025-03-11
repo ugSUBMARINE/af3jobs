@@ -56,17 +56,14 @@ class Job:
 
     def _get_ids(self, ids: None | str | list[str], count: int) -> list[str]:
         if ids is None:
-            if count >= 1:
-                ids = list(islice(self._chain_ids, count))
-            else:
-                raise ValueError(
-                    "Number of chains or ligands must be greater than zero."
-                )
+            ids = list(islice(self._chain_ids, count))
         else:
             if isinstance(ids, str):
                 ids = [ids]
             elif not isinstance(ids, list):
                 raise TypeError("IDs must be a string or a list of strings.")
+        if not ids:
+            raise ValueError("Number of chains or ligands must be greater than zero.")
         return ids
 
     def add_protein_chain(
