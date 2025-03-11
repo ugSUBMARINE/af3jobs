@@ -72,6 +72,11 @@ class Chain:
     paired_msa: str | None = None
     paired_msa_path: str | None = None
 
+    def __post_init__(self) -> None:
+        """Check for empty sequence."""
+        if not self.sequence:
+            raise ValueError("Sequence cannot be empty.")
+
     def add_modification(self, mod_type: str, position: int) -> Self:
         """Add a modification to the chain."""
         mod = SequenceModification(mod_type, position)
@@ -156,8 +161,9 @@ class ProteinChain(Chain):
 
     templates: None | list[Template] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Check if the protein sequence contains only legal one-letter codes."""
+        super().__post_init__()
         one_letter_codes = set("ACDEFGHIKLMNPQRSTVWY")
         diff = set(self.sequence.upper()).difference(one_letter_codes)
         if diff:
@@ -247,8 +253,9 @@ class ProteinChain(Chain):
 class DnaChain(Chain):
     """Represents a DNA chain in the job definition."""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Check if the DNA sequence contains only 'A', 'C', 'G', or 'T'."""
+        super().__post_init__()
         diff = set(self.sequence.upper()).difference({"A", "C", "G", "T"})
         if diff:
             raise ValueError(
@@ -268,8 +275,9 @@ class DnaChain(Chain):
 class RnaChain(Chain):
     """Represents an RNA chain in the job definition."""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Check if the RNA sequence contains only 'A', 'C', 'G', or 'U'."""
+        super().__post_init__()
         diff = set(self.sequence.upper()).difference({"A", "C", "G", "U"})
         if diff:
             raise ValueError(
