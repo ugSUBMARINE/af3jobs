@@ -156,6 +156,15 @@ class ProteinChain(Chain):
 
     templates: None | list[Template] = None
 
+    def __post_init__(self):
+        """Check if the protein sequence contains only legal one-letter codes."""
+        one_letter_codes = set("ACDEFGHIKLMNPQRSTVWY")
+        diff = set(self.sequence.upper()).difference(one_letter_codes)
+        if diff:
+            raise ValueError(
+                f"Protein sequence contains invalid one-letter codes: {', '.join(repr(b) for b in sorted(diff))}."
+            )
+
     def add_template(
         self, mmcif: str, query_indices: list[int], template_indices: list[int]
     ) -> Self:
@@ -238,6 +247,14 @@ class ProteinChain(Chain):
 class DnaChain(Chain):
     """Represents a DNA chain in the job definition."""
 
+    def __post_init__(self):
+        """Check if the DNA sequence contains only 'A', 'C', 'G', or 'T'."""
+        diff = set(self.sequence.upper()).difference({"A", "C", "G", "T"})
+        if diff:
+            raise ValueError(
+                f"DNA sequence can only contain 'A', 'C', 'G', or 'T'. Found {', '.join(repr(b) for b in sorted(diff))}."
+            )
+
     def to_dict(self, *args: Any) -> dict[str, Any]:
         d = super().to_dict()
         if self.modifications:
@@ -250,6 +267,14 @@ class DnaChain(Chain):
 
 class RnaChain(Chain):
     """Represents an RNA chain in the job definition."""
+
+    def __post_init__(self):
+        """Check if the RNA sequence contains only 'A', 'C', 'G', or 'U'."""
+        diff = set(self.sequence.upper()).difference({"A", "C", "G", "U"})
+        if diff:
+            raise ValueError(
+                f"RNA sequence can only contain 'A', 'C', 'G', or 'U'. Found {', '.join(repr(b) for b in sorted(diff))}."
+            )
 
     def to_dict(self, version: int = 2) -> dict[str, Any]:
         d = super().to_dict()
