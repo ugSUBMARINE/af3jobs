@@ -73,8 +73,7 @@ class Job:
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> ProteinChain:
         """Add a protein chain to the job."""
-        ids = self._get_ids(ids, count)
-        chn = ProteinChain(ids, sequence)
+        chn = ProteinChain(self._get_ids(ids, count), sequence)
         self.sequences.append(chn)
         return chn
 
@@ -82,8 +81,7 @@ class Job:
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> DnaChain:
         """Add a DNA chain to the job."""
-        ids = self._get_ids(ids, count)
-        chn = DnaChain(ids, sequence)
+        chn = DnaChain(self._get_ids(ids, count), sequence)
         self.sequences.append(chn)
         return chn
 
@@ -91,8 +89,7 @@ class Job:
         self, sequence: str, count: int = 1, ids: None | str | list[str] = None
     ) -> RnaChain:
         """Add an RNA chain to the job."""
-        ids = self._get_ids(ids, count)
-        chn = RnaChain(ids, sequence)
+        chn = RnaChain(self._get_ids(ids, count), sequence)
         self.sequences.append(chn)
         return chn
 
@@ -110,13 +107,13 @@ class Job:
             warnings.warn(
                 "`ccd_codes` and `smiles` are given - they are mutually exclusive - will be using smiles"
             )
-        ids = self._get_ids(ids, count)
+        _ids = self._get_ids(ids, count)
         if smiles:
-            ligand = Ligand(ids, smiles=smiles)
+            ligand = Ligand(_ids, smiles=smiles)
         else:
             if isinstance(ccd_codes, str):
                 ccd_codes = [ccd_codes]
-            ligand = Ligand(ids, ccd_codes=ccd_codes)
+            ligand = Ligand(_ids, ccd_codes=ccd_codes)
         self.sequences.append(ligand)
         return ligand
 

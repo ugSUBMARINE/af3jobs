@@ -64,7 +64,7 @@ class Template:
 class Chain:
     """Base class for protein and nucleotide chains."""
 
-    ids: str | list[str]
+    ids: list[str]
     sequence: str
     modifications: list[SequenceModification] = field(default_factory=list)
     unpaired_msa: str | None = None
@@ -302,7 +302,7 @@ class RnaChain(Chain):
 class Ligand:
     """Represents a ligand or an ion in the job definition."""
 
-    ids: str | list[str]
+    ids: list[str]
     ccd_codes: None | str | list[str] = None
     smiles: str = ""
 
