@@ -311,7 +311,7 @@ class Ligand:
     """Represents a ligand or an ion in the job definition."""
 
     ids: list[str]
-    ccd_codes: None | str | list[str] = None
+    ccd_codes: None | list[str] = None
     smiles: str = ""
 
     def to_dict(self, *args: Any) -> dict[str, Any]:
@@ -319,6 +319,11 @@ class Ligand:
         # if a SMILES string is provided, use it; otherwise, use CCD codes
         if self.smiles:
             d["smiles"] = self.smiles
+        elif self.ccd_codes:
+            d["ccdCodes"] = self.ccd_codes
         else:
-            d["ccdCodes"] = self.ccd_codes  # type: ignore
+            # This should not happen, if the ligand object is created via the Job class
+            raise RuntimeError(
+                "Either SMILES or CCD codes must be provided for the ligand."
+            )
         return {"ligand": d}

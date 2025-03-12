@@ -93,14 +93,14 @@ class Job:
     def add_ligand(
         self,
         ccd_codes: str | list[str] | None = None,
-        smiles: str | None = None,
+        smiles: str = "",
         count: int = 1,
         ids: None | str | list[str] = None,
     ) -> Ligand:
         """Add a ligand to the job."""
-        if ccd_codes is None and smiles is None:
+        if not ccd_codes and not smiles:
             raise ValueError("Either CCD codes or SMILES string must be provided.")
-        if ccd_codes is not None and smiles is not None:
+        if ccd_codes and smiles:
             warnings.warn(
                 "`ccd_codes` and `smiles` are given - they are mutually exclusive - will be using smiles"
             )
