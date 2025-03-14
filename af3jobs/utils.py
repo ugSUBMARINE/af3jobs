@@ -81,7 +81,7 @@ def get_templates_from_json(json_file: str, sequence: str) -> list[Any] | None:
     for entry in data["sequences"]:
         if chain := entry.get("protein"):
             if chain["sequence"] == sequence:
-                templates: list[Any] = entry["templates"]
+                templates: list[Any] = chain["templates"]
                 return templates
 
     return None
