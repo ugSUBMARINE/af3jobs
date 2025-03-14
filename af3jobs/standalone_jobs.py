@@ -10,11 +10,12 @@ https://github.com/google-deepmind/alphafold3/blob/main/docs/input.md
 
 from __future__ import annotations
 
+import json
 import warnings
 from dataclasses import dataclass, field
 from itertools import islice
 from random import randint
-from typing import Any
+from typing import Any, Type
 
 from .components import DnaChain, Ligand, ProteinChain, RnaChain
 from .utils import chain_id
@@ -181,7 +182,38 @@ class Job:
 
     def write_af3_json(self, filename: str, **kwargs: Any) -> None:
         """Write the job to a JSON file as input for AF3."""
-        import json
-
         with open(filename, "w") as f:
             json.dump(self.to_dict(), f, **kwargs)
+
+    @staticmethod
+    def from_json(filename: str) -> Job:
+        """Read a job from a JSON file."""
+        obj_match: dict[str, Type[Sequence]] = {
+            "protein": ProteinChain,
+            "dna": DnaChain,
+            "rna": RnaChain,
+            "ligand": Ligand,
+        }
+
+        with open(filename) as f:
+            data = json.load(f)
+        job = Job(
+            data["name"],
+            data["modelSeeds"],
+            dialect=data["dialect"],
+            version=data["version"],
+        )
+
+        if bonded_pairs := data.get("bondedAtomPairs"):
+            for pair in bonded_pairs:
+                job.add_bonded_atom_pair(*pair[0], *pair[1])
+
+        if user_ccd := data.get("userCCD"):
+            job.user_ccd = user_ccd
+
+        if sequences := data.get("sequences"):
+            for sequence in sequences:
+                ((seq_type, seq_data),) = sequence.items()
+                job.sequences.append(obj_match[seq_type].from_dict(seq_data))
+
+        return job

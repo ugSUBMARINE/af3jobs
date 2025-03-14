@@ -24,6 +24,13 @@ class SequenceModification:
     def __str__(self) -> str:
         return f"   Modification: {self.mod_type} at position {self.position}"
 
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> SequenceModification:
+        return SequenceModification(
+            data.get("ptmType") or data.get("modificationType"),  # type: ignore
+            data.get("ptmPosition") or data.get("basePosition"),  # type: ignore
+        )
+
 
 @dataclass
 class Template:
@@ -73,6 +80,14 @@ class Template:
             "queryIndices": self.query_indices,
             "templateIndices": self.template_indices,
         }
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> Template:
+        mmcif = data.get("mmcif")
+        mmcif_path = data.get("mmcifPath")
+        query_indices = data.get("queryIndices")
+        template_indices = data.get("templateIndices")
+        return Template(mmcif, query_indices, template_indices, mmcif_path)  # type: ignore
 
 
 @dataclass
@@ -161,22 +176,22 @@ class Chain:
                 self.paired_msa = ""
         return self
 
-    def set_unpaired_msa_path(self, path: str) -> Self:
+    def set_unpaired_msa_path(self, path: str | None) -> Self:
         """Set the path to the unpaired MSA file. ONLY for AF3 input file version >= 2."""
         self.unpaired_msa_path = path
         return self
 
-    def set_paired_msa_path(self, path: str) -> Self:
+    def set_paired_msa_path(self, path: str | None) -> Self:
         """Set the path to the paired MSA file. ONLY for AF3 input file version >= 2."""
         self.paired_msa_path = path
         return self
 
-    def set_unpaired_msa(self, msa: str) -> Self:
+    def set_unpaired_msa(self, msa: str | None) -> Self:
         """Set the unpaired MSA."""
         self.unpaired_msa = msa
         return self
 
-    def set_paired_msa(self, msa: str) -> Self:
+    def set_paired_msa(self, msa: str | None) -> Self:
         """Set the paired MSA."""
         self.paired_msa = msa
         return self
@@ -304,6 +319,29 @@ class ProteinChain(Chain):
 
         return {"protein": d}
 
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> ProteinChain:
+        ids = data.get("id")
+        if isinstance(ids, str):
+            ids = [ids]
+        protein_chain = (
+            ProteinChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+            .set_unpaired_msa(data.get("unpairedMsa"))
+            .set_unpaired_msa_path(data.get("unpairedMsaPath"))
+            .set_paired_msa(data.get("pairedMsa"))
+            .set_paired_msa_path(data.get("pairedMsaPath"))
+        )
+
+        for mod in data.get("modifications", []):
+            protein_chain.modifications.append(SequenceModification.from_dict(mod))
+
+        for template in data.get("templates", []):
+            if protein_chain.templates is None:
+                protein_chain.templates = []
+            protein_chain.templates.append(Template.from_dict(template))
+
+        return protein_chain
+
 
 class DnaChain(Chain):
     """Represents a DNA chain in the job definition."""
@@ -332,6 +370,18 @@ class DnaChain(Chain):
                 for mod in self.modifications
             ]
         return {"dna": d}
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> DnaChain:
+        ids = data.get("id")
+        if isinstance(ids, str):
+            ids = [ids]
+        dna_chain = DnaChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+
+        for mod in data.get("modifications", []):
+            dna_chain.modifications.append(SequenceModification.from_dict(mod))
+
+        return dna_chain
 
 
 class RnaChain(Chain):
@@ -380,6 +430,22 @@ class RnaChain(Chain):
 
         return {"rna": d}
 
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> RnaChain:
+        ids = data.get("id")
+        if isinstance(ids, str):
+            ids = [ids]
+        rna_chain = (
+            RnaChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+            .set_unpaired_msa(data.get("unpairedMsa"))
+            .set_unpaired_msa_path(data.get("unpairedMsaPath"))
+        )
+
+        for mod in data.get("modifications", []):
+            rna_chain.modifications.append(SequenceModification.from_dict(mod))
+
+        return rna_chain
+
 
 @dataclass
 class Ligand:
@@ -413,6 +479,13 @@ class Ligand:
                 "Either SMILES or CCD codes must be provided for the ligand."
             )
         return {"ligand": d}
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> Ligand:
+        ids = data.get("id")
+        if isinstance(ids, str):
+            ids = [ids]
+        return Ligand(ids, data.get("ccdCodes"), data.get("smiles") or "")  # type: ignore
 
 
 def _generate_msa_str(msa: str, name: str) -> list[str]:
