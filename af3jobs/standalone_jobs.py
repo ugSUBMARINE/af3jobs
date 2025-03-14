@@ -46,6 +46,38 @@ class Job:
         # Initialize the chain ID generator
         self._chain_ids = chain_id()
 
+    def __str__(self) -> str:
+        """Return a string representation of the job."""
+        lines = [
+            f"Job name: {self.name}",
+            f"Dialect: {self.dialect}",
+            f"Version: {self.version}",
+            f"Model seeds: {self.model_seeds}",
+        ]
+        num_seq = len(self.sequences)
+        if num_seq == 0:
+            lines.append("No sequences.")
+        else:
+            lines.append(f"{num_seq} Sequence(s):")
+            for seq in self.sequences:
+                lines.append(str(seq))
+
+        if self.bonded_atom_pairs:
+            lines.append("Bonded atom pairs:")
+            for pair in self.bonded_atom_pairs:
+                lines.append(f"  {pair[0]} -- {pair[1]}")
+
+        if self.user_ccd:
+            # get the names of the compounds defined in the user CCD
+            data = [
+                line.split("data_")[-1]
+                for line in self.user_ccd.splitlines()
+                if line.startswith("data_")
+            ]
+            lines.append(f"User CCD: {', '.join(data)}")
+
+        return "\n".join(lines)
+
     def _check_ids(self) -> None:
         """Check for duplicate IDs."""
         seq_ids: list[str] = []

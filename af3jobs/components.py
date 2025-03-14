@@ -21,6 +21,9 @@ class SequenceModification:
     mod_type: str  # modification type
     position: int  # position of the modification (1-based)
 
+    def __str__(self) -> str:
+        return f"   Modification: {self.mod_type} at position {self.position}"
+
 
 @dataclass
 class Template:
@@ -42,6 +45,18 @@ class Template:
             )
         if len(self.query_indices) != len(self.template_indices):
             raise ValueError("Query and template indices must have the same length.")
+
+    def __str__(self) -> str:
+        if self.mmcif:
+            data = [
+                line.split("data_")[-1]
+                for line in self.mmcif.splitlines()
+                if line.startswith("data_")
+            ]
+            prefix = data[0]
+        else:
+            prefix = f"mmcif_path = {self.mmcif_path!r}"
+        return f"{prefix}, {len(self.query_indices)} query indices"
 
     def to_dict(self, version: int) -> dict[str, Any]:
         if self.mmcif:
@@ -76,6 +91,18 @@ class Chain:
         """Check for empty sequence."""
         if not self.sequence:
             raise ValueError("Sequence cannot be empty.")
+
+    def __str__(self) -> str:
+        if len(self.sequence) > 25:
+            seq = f"{self.sequence[:10]}.....{self.sequence[-10:]}"
+        else:
+            seq = self.sequence
+        lines = [
+            f"   {'ID' if len(self.ids) == 1 else 'IDs'}: {', '.join(self.ids)}",
+            f"   Sequence: {seq}, {len(self.sequence)} residues",
+        ]
+        lines.extend(str(m) for m in self.modifications)
+        return "\n".join(lines)
 
     def add_modification(self, mod_type: str, position: int) -> Self:
         """Add a modification to the chain."""
@@ -171,6 +198,34 @@ class ProteinChain(Chain):
                 f"Protein sequence contains invalid one-letter codes: {', '.join(repr(b) for b in sorted(diff))}."
             )
 
+    def __str__(self) -> str:
+        lines = [
+            "++ Protein chain:",
+            super().__str__(),
+        ]
+
+        if self.unpaired_msa is not None:
+            lines.extend(_generate_msa_str(self.unpaired_msa, "Unpaired MSA"))
+        elif self.unpaired_msa_path is not None:
+            lines.append(f"   Unpaired MSA: path =  {self.unpaired_msa_path!r}")
+
+        if self.paired_msa is not None:
+            lines.extend(_generate_msa_str(self.paired_msa, "Paired MSA"))
+        elif self.paired_msa_path is not None:
+            lines.append(f"   Paired MSA: path = {self.paired_msa_path!r}")
+
+        if self.templates is not None:
+            if len(self.templates) > 0:
+                lines.append(f"   Template(s): {len(self.templates)}")
+                for i, template in enumerate(self.templates, start=1):
+                    lines.append(f"{i:7d}: {str(template)}")
+            else:
+                lines.append(
+                    "   Template(s): empty list -> will perform no template search"
+                )
+
+        return "\n".join(lines)
+
     def add_template(
         self, mmcif: str, query_indices: list[int], template_indices: list[int]
     ) -> Self:
@@ -262,6 +317,13 @@ class DnaChain(Chain):
                 f"DNA sequence can only contain 'A', 'C', 'G', or 'T'. Found {', '.join(repr(b) for b in sorted(diff))}."
             )
 
+    def __str__(self) -> str:
+        lines = [
+            "++ DNA chain:",
+            super().__str__(),
+        ]
+        return "\n".join(lines)
+
     def to_dict(self, *args: Any) -> dict[str, Any]:
         d = super().to_dict()
         if self.modifications:
@@ -283,6 +345,19 @@ class RnaChain(Chain):
             raise ValueError(
                 f"RNA sequence can only contain 'A', 'C', 'G', or 'U'. Found {', '.join(repr(b) for b in sorted(diff))}."
             )
+
+    def __str__(self) -> str:
+        lines = [
+            "++ RNA chain:",
+            super().__str__(),
+        ]
+
+        if self.unpaired_msa is not None:
+            lines.extend(_generate_msa_str(self.unpaired_msa, "Unpaired MSA"))
+        elif self.unpaired_msa_path is not None:
+            lines.append(f"   Unpaired MSA: path = {self.unpaired_msa_path!r}")
+
+        return "\n".join(lines)
 
     def to_dict(self, version: int = 2) -> dict[str, Any]:
         d = super().to_dict()
@@ -314,6 +389,17 @@ class Ligand:
     ccd_codes: None | list[str] = None
     smiles: str = ""
 
+    def __str__(self) -> str:
+        lines = [
+            "++ Ligand:",
+            f"   {'ID' if len(self.ids) == 1 else 'IDs'}: {', '.join(self.ids)}",
+        ]
+        if self.smiles:
+            lines.append(f"   SMILES: {self.smiles}")
+        elif self.ccd_codes:
+            lines.append(f"   CCD codes: {', '.join(self.ccd_codes)}")
+        return "\n".join(lines)
+
     def to_dict(self, *args: Any) -> dict[str, Any]:
         d = {"id": self.ids if len(self.ids) > 1 else self.ids[0]}
         # if a SMILES string is provided, use it; otherwise, use CCD codes
@@ -327,3 +413,21 @@ class Ligand:
                 "Either SMILES or CCD codes must be provided for the ligand."
             )
         return {"ligand": d}
+
+
+def _generate_msa_str(msa: str, name: str) -> list[str]:
+    """Generate a list of strings for the MSA output"""
+    msa_lines = msa.splitlines()
+    num_lines = len(msa_lines)
+    lines = []
+    if num_lines == 0:
+        lines.append(f"   {name}: empty string")
+    elif num_lines <= 8:
+        lines.append(f"   {name}: {num_lines} lines.")
+        lines.extend(f"      {line[:60]}" for line in msa_lines)
+    else:
+        lines.append(f"   {name}: {len(msa_lines)} lines.")
+        lines.extend(f"      {line[:60]}" for line in msa_lines[:4])
+        lines.append("      ...")
+        lines.extend(f"      {line[:60]}" for line in msa_lines[-4:])
+    return lines
