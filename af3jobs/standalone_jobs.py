@@ -197,7 +197,7 @@ class Job:
 
         with open(filename) as f:
             data = json.load(f)
-        job = Job(
+        job = cls(
             data["name"],
             data["modelSeeds"],
             dialect=data["dialect"],

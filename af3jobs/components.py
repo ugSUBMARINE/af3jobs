@@ -26,7 +26,7 @@ class SequenceModification:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> SequenceModification:
-        return SequenceModification(
+        return cls(
             data.get("ptmType") or data.get("modificationType"),  # type: ignore
             data.get("ptmPosition") or data.get("basePosition"),  # type: ignore
         )
@@ -87,7 +87,7 @@ class Template:
         mmcif_path = data.get("mmcifPath")
         query_indices = data.get("queryIndices")
         template_indices = data.get("templateIndices")
-        return Template(mmcif, query_indices, template_indices, mmcif_path)  # type: ignore
+        return cls(mmcif, query_indices, template_indices, mmcif_path)  # type: ignore
 
 
 @dataclass
@@ -325,7 +325,7 @@ class ProteinChain(Chain):
         if isinstance(ids, str):
             ids = [ids]
         protein_chain = (
-            ProteinChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+            cls(ids=ids, sequence=data.get("sequence"))  # type: ignore
             .set_unpaired_msa(data.get("unpairedMsa"))
             .set_unpaired_msa_path(data.get("unpairedMsaPath"))
             .set_paired_msa(data.get("pairedMsa"))
@@ -376,7 +376,7 @@ class DnaChain(Chain):
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
-        dna_chain = DnaChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+        dna_chain = cls(ids=ids, sequence=data.get("sequence"))  # type: ignore
 
         for mod in data.get("modifications", []):
             dna_chain.modifications.append(SequenceModification.from_dict(mod))
@@ -436,7 +436,7 @@ class RnaChain(Chain):
         if isinstance(ids, str):
             ids = [ids]
         rna_chain = (
-            RnaChain(ids=ids, sequence=data.get("sequence"))  # type: ignore
+            cls(ids=ids, sequence=data.get("sequence"))  # type: ignore
             .set_unpaired_msa(data.get("unpairedMsa"))
             .set_unpaired_msa_path(data.get("unpairedMsaPath"))
         )
@@ -485,7 +485,7 @@ class Ligand:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
-        return Ligand(ids, data.get("ccdCodes"), data.get("smiles") or "")  # type: ignore
+        return cls(ids, data.get("ccdCodes"), data.get("smiles") or "")  # type: ignore
 
 
 def _generate_msa_str(msa: str, name: str) -> list[str]:
