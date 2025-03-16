@@ -15,7 +15,7 @@ import warnings
 from dataclasses import dataclass, field
 from itertools import islice
 from random import randint
-from typing import Any, Type
+from typing import Any, Self, Type
 
 from .components import DnaChain, Ligand, ProteinChain, RnaChain
 from .utils import chain_id
@@ -186,7 +186,7 @@ class Job:
             json.dump(self.to_dict(), f, **kwargs)
 
     @classmethod
-    def from_json(cls, filename: str) -> Job:
+    def from_json(cls, filename: str) -> Self:
         """Read a job from a JSON file."""
         obj_match: dict[str, Type[Sequence]] = {
             "protein": ProteinChain,

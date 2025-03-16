@@ -13,7 +13,6 @@ from typing import Any, Self
 from .utils import get_msa_from_a3m, get_msa_from_json, get_templates_from_json
 
 
-# Base class for sequence modifications
 @dataclass
 class SequenceModification:
     """Base class for sequence modifications."""
@@ -25,7 +24,7 @@ class SequenceModification:
         return f"   Modification: {self.mod_type} at position {self.position}"
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> SequenceModification:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
             data.get("ptmType") or data.get("modificationType"),  # type: ignore
             data.get("ptmPosition") or data.get("basePosition"),  # type: ignore
@@ -82,7 +81,7 @@ class Template:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Template:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         mmcif = data.get("mmcif")
         mmcif_path = data.get("mmcifPath")
         query_indices = data.get("queryIndices")
@@ -320,7 +319,7 @@ class ProteinChain(Chain):
         return {"protein": d}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> ProteinChain:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -372,7 +371,7 @@ class DnaChain(Chain):
         return {"dna": d}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> DnaChain:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -431,7 +430,7 @@ class RnaChain(Chain):
         return {"rna": d}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> RnaChain:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -481,7 +480,7 @@ class Ligand:
         return {"ligand": d}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Ligand:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
