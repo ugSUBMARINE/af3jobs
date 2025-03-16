@@ -185,8 +185,8 @@ class Job:
         with open(filename, "w") as f:
             json.dump(self.to_dict(), f, **kwargs)
 
-    @staticmethod
-    def from_json(filename: str) -> Job:
+    @classmethod
+    def from_json(cls, filename: str) -> Job:
         """Read a job from a JSON file."""
         obj_match: dict[str, Type[Sequence]] = {
             "protein": ProteinChain,

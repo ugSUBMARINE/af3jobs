@@ -24,8 +24,8 @@ class SequenceModification:
     def __str__(self) -> str:
         return f"   Modification: {self.mod_type} at position {self.position}"
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> SequenceModification:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SequenceModification:
         return SequenceModification(
             data.get("ptmType") or data.get("modificationType"),  # type: ignore
             data.get("ptmPosition") or data.get("basePosition"),  # type: ignore
@@ -81,8 +81,8 @@ class Template:
             "templateIndices": self.template_indices,
         }
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> Template:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Template:
         mmcif = data.get("mmcif")
         mmcif_path = data.get("mmcifPath")
         query_indices = data.get("queryIndices")
@@ -319,8 +319,8 @@ class ProteinChain(Chain):
 
         return {"protein": d}
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> ProteinChain:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ProteinChain:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -371,8 +371,8 @@ class DnaChain(Chain):
             ]
         return {"dna": d}
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> DnaChain:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> DnaChain:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -430,8 +430,8 @@ class RnaChain(Chain):
 
         return {"rna": d}
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> RnaChain:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> RnaChain:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
@@ -480,8 +480,8 @@ class Ligand:
             )
         return {"ligand": d}
 
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> Ligand:
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Ligand:
         ids = data.get("id")
         if isinstance(ids, str):
             ids = [ids]
